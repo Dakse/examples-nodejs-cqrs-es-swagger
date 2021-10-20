@@ -9,6 +9,8 @@ import { UsersService } from './services/users.service';
 import { UserRepository } from './repository/user.repository';
 import { EventStoreModule } from '../core/event-store/event-store.module';
 import { EventStore } from '../core/event-store/event-store';
+import { KafkaModule } from '../core/kafka/kafka.module';
+import { Kafka } from '../core/kafka/kafka';
 import { UserCreatedEvent } from './events/impl/user-created.event';
 import { UserDeletedEvent } from './events/impl/user-deleted.event';
 import { UserUpdatedEvent } from './events/impl/user-updated.event';
@@ -18,6 +20,7 @@ import { UserWelcomedEvent } from './events/impl/user-welcomed.event';
   imports: [
     CQRSModule,
     EventStoreModule.forFeature(),
+    KafkaModule.forFeature(),
   ],
   controllers: [UsersController],
   providers: [
@@ -35,6 +38,7 @@ export class UsersModule implements OnModuleInit {
     private readonly event$: EventBus,
     private readonly usersSagas: UsersSagas,
     private readonly eventStore: EventStore,
+    private readonly kafka: Kafka,
   ) {}
 
   onModuleInit() {
@@ -43,7 +47,10 @@ export class UsersModule implements OnModuleInit {
     /** ------------ */
     this.eventStore.setEventHandlers(this.eventHandlers);
     this.eventStore.bridgeEventsTo((this.event$ as any).subject$);
-    this.event$.publisher = this.eventStore;
+
+
+
+    this.event$.publisher = this.kafka;
     /** ------------ */
     this.event$.register(EventHandlers);
     this.command$.register(CommandHandlers);

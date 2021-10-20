@@ -15,6 +15,7 @@ export class CreateUserHandler
     Logger.log('Async CreateUserHandler...', 'CreateUserCommand');
 
     const {userDto} = command;
+    console.log(command.userDto)
     const user = this.publisher.mergeObjectContext(
       await this.repository.createUser(userDto),
     );
